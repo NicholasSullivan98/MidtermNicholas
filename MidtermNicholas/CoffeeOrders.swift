@@ -9,30 +9,31 @@ import SwiftUI
 
 struct CoffeeOrders: View {
     
+    var price : Double = 0
+    var HST : Double = 0
+    var tip : Double = 0
+    var totalPrice : Double = 0
+    
     @Binding var coffeeOrder : Coffee
     
-    var price : Double
-    var HST : Double
-    var tip : Double = 0
-    var totalPrice : Double
-    
     var body: some View {
+        
         Text("Hi \(coffeeOrder.name) ")
         Text("Your Order Details:")
         Text("\(coffeeOrder.size) \(coffeeOrder.type)")
         Text("Quantity: \(coffeeOrder.numOfCups)")
-        Text("Base Price: \(price)")
-        Text("HST: \(HST)")
-        Text("Tip \(tip)")
-        Text("Total Price: \(totalPrice)")
-        
+        Text("Base Price: $\(price)")
+        Text("HST: $\(HST)")
+        Text("Tip $\(tip)")
+        Text("Total Price: $\(totalPrice)")
+                
     }
     
     mutating func priceCalc(){
         
-        if(coffeeOrder.type == "Original Blend"){
+        if(coffeeOrder.type == "Original"){
             price = 3.50
-        }else if(coffeeOrder.type == "Dark Roast"){
+        }else if(coffeeOrder.type == "Dark"){
             price = 4.00
         }else{
             price = 4.50

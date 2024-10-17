@@ -20,12 +20,17 @@ struct ContentView: View {
     
     @State var selectedSize : Size = .Small
     @State var selectedCoffeeType : CoffeeType = .Original
-    @State var quantity : String = "1"
+    @State var quantity : String = ""
     @State var tip = false
     @State var showAlert  = false
     @State private var name: String = ""
-
+    
     @State var coffeeOrder: Coffee = Coffee(name: "", size: "", type: "", tip: false, numOfCups: 0)
+    
+    @State var price : Double = 0
+    @State var HST : Double = 0
+    @State var tipPrice : Double = 0
+    @State var totalPrice : Double = 0
     
     
     enum Size: String, CaseIterable, Identifiable {
@@ -70,22 +75,69 @@ struct ContentView: View {
                 TextField("Number of Cups", text: $quantity)
                 
                 Button("Add Coffee"){
+                    
+                    // Validate Fields
+                    if(name == nil){
+                        showAlert = true
+                    }else if(Int(quantity) == nil){
+                        showAlert = true
+                    }
+                    
                     coffeeOrder.name = name
                     coffeeOrder.type = selectedCoffeeType.rawValue
                     coffeeOrder.size = selectedSize.rawValue
                     coffeeOrder.tip = tip
                     coffeeOrder.numOfCups = Int(quantity) ?? 0
+                    
+                    //Price Calculations
+                    if(coffeeOrder.type == "Original"){
+                        price = 3.50
+                    }else if(coffeeOrder.type == "Dark"){
+                        price = 4.00
+                    }else{
+                        price = 4.50
+                    }
+                    
+                    if(coffeeOrder.size == "Medium"){
+                        price = price + 0.50
+                    }else if(coffeeOrder.size == "Large"){
+                        price = price + 1.00
+                    }
+                    
+                    HST = price * 0.13
+                    
+                    if(coffeeOrder.tip == true){
+                        tipPrice = 2.00
+                        totalPrice = price + HST + tipPrice
+                    }else{
+                        totalPrice = price + HST
+                    }
+                    
+                    round(price)
+                    round(HST)
+                    round(tipPrice)
+                    round(totalPrice)
                 }
                 
                 
-                NavigationLink(destination: CoffeeOrders(coffeeOrder: $coffeeOrder, price: 0, HST: 0, tip: 0, totalPrice: 0)){
+                NavigationLink(destination: CoffeeOrders(price: price, HST: HST, tip: tipPrice, totalPrice: totalPrice, coffeeOrder: $coffeeOrder)){
                     Text("Place Order")
                 }.padding(10)
                 
-            }
-            .padding(10)
-        }.alert("Data is not valid", isPresented: $showAlert){
-            Button("Ok" , role: .cancel) {}
+            }.padding(20)
+        }.alert(isPresented: $showAlert){
+            Alert(
+                title: Text("Invalid Data"),
+                message: Text("Please enter valid data"),
+                primaryButton: .default(
+                    Text("Ok")
+                    
+                ),
+                secondaryButton: .cancel(
+                    Text("Cancel")
+                )
+                
+            )
         }
     }
 }
